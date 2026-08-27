@@ -1,49 +1,71 @@
-# Eureka Server
+# Eureka Server - Service Registry & Discovery
 
-This project is a Spring Boot application that runs a Netflix Eureka service registry. It is used to register and discover microservices in a distributed system.
+A foundational platform component built with Spring Cloud Netflix Eureka Server, acting as the dynamic phonebook and service registry for microservices across the enterprise cloud architecture.
 
-## Overview
+---
 
-Eureka Server acts as the central discovery service for your application ecosystem. Other services can register themselves with the server and query it to discover available instances.
+## Student & Project Information
 
-This project is configured as a standalone registry and does not register itself with another Eureka instance.
+| Field | Details |
+| :--- | :--- |
+| Student Name | Nethmi Nanayakkara |
+| Student ID | 241722047 |
+| GCP Project ID | `nethmi-project` |
+| Module | ITS 2130 - Enterprise Cloud Architecture |
+| Component Role | Dynamic Service Registry & Discovery |
 
-## Technologies
+---
+
+## Overview & Architecture
+
+Eureka Server removes the need to hardcode hostnames, IP addresses, and ports between microservices. When backend services such as User Service, Event Service, Media Service, and API Gateway start up, they register themselves with Eureka and send periodic heartbeats so the registry can keep track of healthy instances.
+
+### Key Cloud & Platform Capabilities
+
+- Dynamic service registration for new and autoscaled instances launched in Google Compute Engine Managed Instance Groups.
+- Client-side load balancing integration using logical service IDs such as `lb://SERVICE-NAME`.
+- Heartbeat and self-preservation support to monitor node health and evict unresponsive instances.
+- Web dashboard for viewing active service instances, hostnames, and UP status in real time.
+
+---
+
+## Technology Stack
 
 - Java 21
 - Spring Boot 3.4.0
-- Spring Cloud 2024.0.0
-- Netflix Eureka Server
+- Spring Cloud Netflix Eureka Server
 - Maven
 
-## Project Structure
+---
 
-- `src/main/java/com/example/eureka_server/EurekaServerApplication.java` - Spring Boot entry point
-- `src/main/resources/application.yml` - Server configuration
-- `src/test/java/com/example/eureka_server/EurekaServerApplicationTests.java` - Basic application test
+## Registry & Diagnostic Endpoints
 
-## Configuration
+| Method | Endpoint | Description | Response |
+| :--- | :--- | :--- | :--- |
+| GET | `/` | Eureka Web Management Dashboard | `200 OK` (HTML web interface) |
+| GET | `/eureka/apps` | Fetch all registered instances | `200 OK` (XML / JSON application registry tree) |
+| GET | `/eureka/apps/{appID}` | Fetch specific service instance details | `200 OK` (instance metadata) |
+| GET | `/actuator/health` | Service health status check | `{"status":"UP"}` |
 
-The application listens on port `8761` and exposes the Eureka dashboard at:
+---
 
-- http://localhost:8761
+## Local Setup & Development
 
-Key settings in `application.yml`:
+### Prerequisites
 
-- `server.port: 8761`
-- `eureka.client.register-with-eureka: false`
-- `eureka.client.fetch-registry: false`
+- JDK 21+
+- Apache Maven 3.8+
 
-These settings make this instance a standalone Eureka server instead of a client of another registry.
+### Clone the Repository
 
-## Prerequisites
+```bash
+git clone https://github.com/NethmiDN/Eureka_Server.git
+cd Eureka_Server
+```
 
-- JDK 21 or later
-- Maven 3.9+ (or use the bundled Maven wrapper)
+### Run the Application
 
-## Run the application
-
-Using Maven Wrapper:
+Using Maven Wrapper on macOS/Linux:
 
 ```bash
 ./mvnw spring-boot:run
@@ -61,22 +83,54 @@ Or using Maven directly:
 mvn spring-boot:run
 ```
 
-## Access the Eureka dashboard
-
-Open the following URL in a browser:
-
-```text
-http://localhost:8761
-```
-
-You will see the Eureka dashboard with registry information and service status.
-
-## Build the project
+### Build the Project
 
 ```bash
 ./mvnw clean package
 ```
 
-## Notes
+On Windows:
 
-This server is intended to be used as a discovery service for other Spring Boot microservices. Once your client services are configured to point to this Eureka instance, they can register themselves and discover one another automatically.
+```bash
+mvnw.cmd clean package
+```
+
+### Access the Eureka Dashboard
+
+Open the dashboard in a browser:
+
+```text
+http://localhost:8761
+```
+
+The dashboard shows registered services, instance metadata, and runtime status.
+
+---
+
+## Configuration Notes
+
+The application is configured to run as a standalone Eureka server on port `8761`.
+
+Key settings in [application.yml](src/main/resources/application.yml):
+
+- `server.port: 8761`
+- `spring.application.name: eureka-server`
+- `eureka.client.register-with-eureka: false`
+- `eureka.client.fetch-registry: false`
+- `eureka.instance.hostname: localhost`
+
+These settings ensure the server does not register itself as a Eureka client and instead acts as the central registry for other microservices.
+
+---
+
+## Project Structure
+
+- [src/main/java/com/example/eureka_server/EurekaServerApplication.java](src/main/java/com/example/eureka_server/EurekaServerApplication.java) - Spring Boot entry point
+- [src/main/resources/application.yml](src/main/resources/application.yml) - Eureka server configuration
+- [src/test/java/com/example/eureka_server/EurekaServerApplicationTests.java](src/test/java/com/example/eureka_server/EurekaServerApplicationTests.java) - Basic application test
+
+---
+
+## Purpose
+
+This service is intended to support Spring Boot microservices in an enterprise cloud environment by providing dynamic discovery, resilience, and centralized visibility into registered services.
